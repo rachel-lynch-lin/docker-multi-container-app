@@ -2,16 +2,21 @@ language: generic
 sudo: required
 services:
   - docker
-  before_install:
-    - docker build -t rachellynchlin/react-test -f ./client/Dockerfile.dev ./client
+
+before_install:
+  - docker build -t rachellynchlin/react-test -f ./client/Dockerfile.dev ./client
+
 script:
   - docker run -e CI=true rachellynchlin/react-test npm test
+
 after_succes:
   - docker build -t rachellynchlin/multi-client ./client
   - docker build -t rachellynchlin/multi-nginx ./nginx
   - docker build -t rachellynchlin/multi-server ./server
   - docker build -t rachellynchlin/multi-worker ./worker
+  # Log in to the docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
   - docker push rachellynchlin/multi-client
   - docker push rachellynchlin/multi-nginx
   - docker push rachellynchlin/multi-server
